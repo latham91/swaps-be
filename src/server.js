@@ -9,7 +9,7 @@ const port = process.env.PORT || 5001;
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ origin: ["http://localhost:5001"] }));
+app.use(cors({ origin: ["http://localhost:5001", "https://swaps-fe.netlify.app", "http://localhost:5173"] }));
 
 if (process.env.NODE_ENV === "development") {
     app.use(morgan("dev"));

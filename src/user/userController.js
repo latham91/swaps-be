@@ -50,7 +50,6 @@ exports.loginUser = async (req, res) => {
         );
 
         res.cookie("swaps_auth", token, { httpOnly: true, maxAge: 600000 });
-        await User.findByIdAndUpdate(id, { isOnline: true }, { new: true });
 
         return res.status(200).json({
             success: true,
@@ -59,13 +58,11 @@ exports.loginUser = async (req, res) => {
             token,
         });
     } catch (error) {
-        return res
-            .status(500)
-            .json({
-                success: false,
-                message: "Server error",
-                source: "loginUser",
-                error: error.message,
-            });
+        return res.status(500).json({
+            success: false,
+            message: "Server error",
+            source: "loginUser",
+            error: error.message,
+        });
     }
 };

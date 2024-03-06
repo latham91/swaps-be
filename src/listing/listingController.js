@@ -24,6 +24,7 @@ exports.getAllListings = async (req, res) => {
 
 exports.getListingById = async (req, res) => {
     try {
+        const id = req.params.id;
         const listing = await Listing.findById(id);
 
         if (!listing) {
@@ -37,13 +38,11 @@ exports.getListingById = async (req, res) => {
             .status(200)
             .json({ success: true, message: "Listing found", listing });
     } catch (error) {
-        return res
-            .status(500)
-            .json({
-                success: false,
-                message: "Server error",
-                source: "getListingById",
-                error: error.message,
-            });
+        return res.status(500).json({
+            success: false,
+            message: "Server error",
+            source: "getListingById",
+            error: error.message,
+        });
     }
 };

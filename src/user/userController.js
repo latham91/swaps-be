@@ -22,12 +22,49 @@ exports.signupUser = async (req, res) => {
             user,
         });
     } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Server error",
+            source: "signupUser",
+            error: error.message,
+        });
+    }
+};
+
+exports.loginUser = async (req, res) => {
+    try {
+        if (!req.user) {
+            return res
+                .status(401)
+                .json({ success: false, message: "Invalid credentials" });
+        }
+
+        const { id, username, email, password } = req.user;
+
+        const token = jwt.sign(
+            { id: id, username, email, password },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: process.env.JWT_EXPIRE,
+            }
+        );
+
+        res.cookie("swaps_auth", token, { httpOnly: true, maxAge: 600000 });
+        await User.findByIdAndUpdate(id, { isOnline: true }, { new: true });
+
+        return res.status(200).json({
+            success: true,
+            message: `${username} logged in`,
+            user: req.user,
+            token,
+        });
+    } catch (error) {
         return res
             .status(500)
             .json({
                 success: false,
                 message: "Server error",
-                source: "signupUser",
+                source: "loginUser",
                 error: error.message,
             });
     }

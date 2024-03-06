@@ -5,10 +5,12 @@ const listingSchema = new mongoose.Schema(
         title: {
             type: String,
             required: true,
+            minlength: 3,
         },
         description: {
             type: String,
             required: true,
+            minlength: 25,
         },
         imageUrl: {
             type: String,

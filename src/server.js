@@ -3,6 +3,7 @@ const express = require("express");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const dbConnect = require("./db/connection");
 
 const app = express();
 const port = process.env.PORT || 5001;
@@ -26,5 +27,6 @@ app.get("/api/health", (req, res) => {
 
 // Start server
 app.listen(port, () => {
+    dbConnect();
     console.log(`Server is listening on port ${port}`);
 });

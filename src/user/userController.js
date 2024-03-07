@@ -43,9 +43,9 @@ exports.loginUser = async (req, res) => {
 
     res.cookie("swaps_auth", token, {
       maxAge: 900000,
-      // sameSite: "None",
+      sameSite: "None",
       secure: true,
-      httpOnly: true,
+      httpOnly: false,
       partitioned: true,
     });
 
@@ -72,5 +72,15 @@ exports.logoutUser = async (req, res) => {
   } catch (error) {
     res.clearCookie("swaps_auth");
     return res.status(500).json({ success: false, message: "Error logging out", error: error.message });
+  }
+};
+
+exports.userSession = async (req, res) => {
+  try {
+    await User.findById(req.user.id);
+    return res.status(200).json({ success: true, user: req.user });
+  } catch (error) {
+    res.clearCookie("swaps_auth");
+    return res.status(500).json({ success: false, message: "Invalid session", error: error.message });
   }
 };

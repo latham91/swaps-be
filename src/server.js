@@ -17,6 +17,7 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: ["http://localhost:5001", "https://swaps-fe.netlify.app", "http://localhost:5173"],
+    credentials: true,
   })
 );
 

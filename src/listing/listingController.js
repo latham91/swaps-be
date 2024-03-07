@@ -1,5 +1,33 @@
 const Listing = require("./listingModel");
 
+exports.createListing = async (req, res) => {
+    try {
+        const { title, description, imageUrl } = req.body;
+
+        if (!title || !imageUrl) {
+            return res.status(400).json({
+                success: false,
+                message: "You must provide a title and at least 1 image",
+            });
+        }
+        const listing = await Listing.create({
+            title,
+            description,
+            imageUrl,
+        });
+        return res
+            .status(200)
+            .json({ success: true, message: "Listing posted", listing });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Server error",
+            source: "createListing",
+            error: error.message,
+        });
+    }
+};
+
 exports.getAllListings = async (req, res) => {
     try {
         const listings = await Listing.find({});

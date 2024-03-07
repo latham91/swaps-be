@@ -43,9 +43,9 @@ exports.loginUser = async (req, res) => {
 
     res.cookie("swaps_auth", token, {
       maxAge: 900000,
-      sameSite: "None",
+      // sameSite: "None",
       secure: true,
-      httpOnly: false,
+      httpOnly: true,
       partitioned: true,
     });
 
@@ -67,7 +67,8 @@ exports.loginUser = async (req, res) => {
 
 exports.logoutUser = async (req, res) => {
   try {
-    return res.clearCookie("swaps_auth");
+    res.clearCookie("swaps_auth");
+    return res.status(200).json({ success: true, message: `${req.user.username} logged out` });
   } catch (error) {
     res.clearCookie("swaps_auth");
     return res.status(500).json({ success: false, message: "Error logging out", error: error.message });

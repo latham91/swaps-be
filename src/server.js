@@ -39,7 +39,7 @@ app.get("/api/health", (req, res) => {
 
 // Routes
 app.use("/api/users", userRoutes);
-app.use("/api/listins", listingRoutes);
+app.use("/api/listings", listingRoutes);
 
 // Start server
 app.listen(port, () => {

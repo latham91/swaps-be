@@ -41,7 +41,13 @@ exports.loginUser = async (req, res) => {
       expiresIn: process.env.JWT_EXPIRE,
     });
 
-    res.cookie("swaps_auth", token, { httpOnly: true, maxAge: 600000 });
+    res.cookie("swaps_auth", token, {
+      maxAge: 900000,
+      sameSite: "None",
+      secure: true,
+      httpOnly: false,
+      partitioned: true,
+    });
 
     return res.status(200).json({
       success: true,

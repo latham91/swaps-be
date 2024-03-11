@@ -65,7 +65,7 @@ exports.getAllListings = async (req, res) => {
 exports.getListingById = async (req, res) => {
   try {
     const id = req.params.listingId;
-    const listing = await Listing.findById(id);
+    const listing = await Listing.findById(id).populate("userId");
 
     if (!listing) {
       return res.status(400).json({

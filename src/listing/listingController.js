@@ -64,7 +64,7 @@ exports.getAllListings = async (req, res) => {
 
 exports.getListingById = async (req, res) => {
   try {
-    const id = req.params.id;
+    const id = req.params.listingId;
     const listing = await Listing.findById(id);
 
     if (!listing) {

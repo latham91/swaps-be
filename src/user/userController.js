@@ -42,7 +42,7 @@ exports.loginUser = async (req, res) => {
     });
 
     res.cookie("swaps_auth", token, {
-      maxAge: 900000,
+      maxAge: 3600000,
       sameSite: "None",
       secure: true,
       httpOnly: false,

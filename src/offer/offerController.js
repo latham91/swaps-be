@@ -16,6 +16,15 @@ exports.offerTrade = async (req, res) => {
       });
     }
 
+    const offerExists = await Offer.findOne({ wantedListingId, offerListingId });
+
+    if (offerExists) {
+      return res.status(400).json({
+        success: false,
+        message: "Offer already exists",
+      });
+    }
+
     const newOffer = await Offer.create({ wantedListingId: wantedListing._id, offerListingId: offerListing._id });
     const addToWantedListing = wantedListing.offersArray.push(newOffer._id);
 

@@ -46,7 +46,9 @@ exports.createListing = async (req, res) => {
 
 exports.getAllListings = async (req, res) => {
   try {
-    const listings = await Listing.find().populate({ path: "userId", select: "-password -__v -listings" });
+    const listings = await Listing.find()
+      .populate({ path: "userId", select: "-password -__v -listings" })
+      .sort({ createdAt: -1 });
 
     if (!listings) {
       return res.status(400).json({ success: false, message: "No listings found" });

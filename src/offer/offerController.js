@@ -53,7 +53,120 @@ exports.offerTrade = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Server error",
-      source: "offerTrade",
+      error: error.message,
+    });
+  }
+};
+
+exports.declineOffer = async (req, res) => {
+  try {
+    const { offerId } = req.params;
+    const { id } = req.user;
+
+    const offer = await Offer.findById(offerId);
+
+    if (!offer) {
+      return res.status(400).json({
+        success: false,
+        message: "Offer not found",
+      });
+    }
+
+    // check to see if the user owns the wanted listing
+    const wantedListing = await Listing.findById(offer.wantedListingId);
+
+    if (wantedListing.userId.toString() !== id) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    const deleteOffer = await Offer.findByIdAndDelete(offerId);
+
+    if (!deleteOffer) {
+      return res.status(400).json({
+        success: false,
+        message: "Offer not deleted",
+      });
+    }
+
+    // remove the offer from the wanted listing
+    const removeOffer = await wantedListing.offersArray.pull(offerId);
+
+    if (!removeOffer) {
+      return res.status(400).json({
+        success: false,
+        message: "Offer not removed from wanted listing",
+      });
+    }
+
+    const saveWantedListing = await wantedListing.save();
+
+    if (!saveWantedListing) {
+      return res.status(400).json({
+        success: false,
+        message: "Offer not removed from wanted listing",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Offer declined",
+      offer,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+exports.acceptOffer = async (req, res) => {
+  try {
+    const { offerId } = req.params;
+    const { id } = req.user;
+
+    const offer = await Offer.findById(offerId);
+
+    if (!offer) {
+      return res.status(400).json({
+        success: false,
+        message: "Offer not found",
+      });
+    }
+
+    // check to see if the user owns the wanted listing
+    const wantedListing = await Listing.findById(offer.wantedListingId);
+
+    if (wantedListing.userId.toString() !== id) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    // change offer isAccepted to true
+    offer.isAccepted = true;
+    const saveOffer = await offer.save();
+
+    if (!saveOffer) {
+      return res.status(400).json({
+        success: false,
+        message: "Offer not saved",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Offer accepted",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
       error: error.message,
     });
   }

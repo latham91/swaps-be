@@ -67,10 +67,13 @@ exports.loginUser = async (req, res) => {
 
 exports.logoutUser = async (req, res) => {
   try {
-    res.clearCookie("swaps_auth");
+    res.clearCookie("insta_auth", {
+      secure: true,
+      sameSite: "None",
+    });
+
     return res.status(200).json({ success: true, message: `${req.user.username} logged out` });
   } catch (error) {
-    res.clearCookie("swaps_auth");
     return res.status(500).json({ success: false, message: "Error logging out", error: error.message });
   }
 };

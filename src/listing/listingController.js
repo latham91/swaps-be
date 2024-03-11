@@ -65,7 +65,20 @@ exports.getAllListings = async (req, res) => {
 exports.getListingById = async (req, res) => {
   try {
     const id = req.params.listingId;
-    const listing = await Listing.findById(id).populate("userId");
+    const listing = await Listing.findById(id)
+      .populate("userId")
+      .populate([
+        { path: "offersArray" },
+        {
+          path: "offersArray",
+          populate: {
+            path: "offerListingId",
+            populate: {
+              path: "userId",
+            },
+          },
+        },
+      ]);
 
     if (!listing) {
       return res.status(400).json({
@@ -80,6 +93,25 @@ exports.getListingById = async (req, res) => {
       success: false,
       message: "Server error",
       source: "getListingById",
+      error: error.message,
+    });
+  }
+};
+
+exports.getUsersListings = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const listings = await Listing.find({ userId });
+
+    if (!listings) {
+      return res.status(400).json({ success: false, message: "No listings found for user" });
+    }
+    return res.status(200).json({ success: true, message: "Users listings", listings });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      source: "getUsersListings",
       error: error.message,
     });
   }

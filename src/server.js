@@ -8,6 +8,7 @@ const dbConnect = require("./db/connection");
 // Route imports
 const userRoutes = require("./user/userRoutes");
 const listingRoutes = require("./listing/listingRoutes");
+const offerRoutes = require("./offer/offerRoutes");
 
 const app = express();
 const port = process.env.PORT || 5001;
@@ -37,6 +38,7 @@ app.get("/api/health", (req, res) => {
 // Routes
 app.use("/api/users", userRoutes);
 app.use("/api/listings", listingRoutes);
+app.use("/api/offers", offerRoutes);
 
 // Start server
 app.listen(port, () => {

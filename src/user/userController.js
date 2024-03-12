@@ -1,5 +1,8 @@
 require("dotenv").config();
 const User = require("./userModel");
+const Offer = require("../offer/offerModel");
+const Listing = require("../listing/listingModel");
+
 const jwt = require("jsonwebtoken");
 
 exports.signupUser = async (req, res) => {
@@ -82,7 +85,15 @@ exports.logoutUser = async (req, res) => {
 
 exports.userSession = async (req, res) => {
   try {
-    return res.status(200).json({ success: true, user: req.user });
+    const user = await User.findById(req.user.id).select("_id username email");
+
+    sessionUser = {
+      id: user._id,
+      username: user.username,
+      email: user.email,
+    };
+
+    return res.status(200).json({ success: true, user: sessionUser });
   } catch (error) {
     await res.clearCookie("swaps_auth", {
       secure: true,
@@ -99,8 +110,22 @@ exports.userSession = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
   try {
-    await User.findByIdAndDelete(req.user.id);
-    return res.status(200).json({ sucess: true, message: `Deleted ${req.user.username}` });
+    const { id } = req.user;
+
+    const userExists = await User.findById(id);
+
+    if (!userExists) {
+      return res.status(400).json({ success: false, message: "No user found" });
+    }
+
+    await User.findByIdAndDelete(id);
+
+    res.clearCookie("swaps_auth", {
+      secure: true,
+      sameSite: "None",
+    });
+
+    return res.status(200).json({ sucess: true, message: `User deleted` });
   } catch (err) {
     return res.status(500).json({
       sucess: false,

@@ -104,7 +104,7 @@ exports.getListingById = async (req, res) => {
 exports.getUsersListings = async (req, res) => {
   try {
     const userId = req.params.userId;
-    const listings = await Listing.find({ userId });
+    const listings = await Listing.find({ userId }).populate("userId", "-password -__v -listingsArray");
 
     if (!listings) {
       return res.status(400).json({ success: false, message: "No listings found for user" });

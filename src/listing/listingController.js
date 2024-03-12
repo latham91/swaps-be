@@ -46,7 +46,9 @@ exports.createListing = async (req, res) => {
 
 exports.getAllListings = async (req, res) => {
   try {
-    const listings = await Listing.find().populate({ path: "userId", select: "-password -__v -listings" });
+    const listings = await Listing.find()
+      .populate({ path: "userId", select: "-password -__v -listings" })
+      .sort({ createdAt: -1 });
 
     if (!listings) {
       return res.status(400).json({ success: false, message: "No listings found" });
@@ -112,6 +114,37 @@ exports.getUsersListings = async (req, res) => {
       success: false,
       message: "Server error",
       source: "getUsersListings",
+      error: error.message,
+    });
+  }
+};
+
+exports.deleteListing = async (req, res) => {
+  try {
+    const { listingId } = req.params;
+    const { id } = req.user;
+
+    const listing = await Listing.findById(listingId);
+
+    if (!listing) {
+      return res.status(400).json({ success: false, message: "Listing not found" });
+    }
+
+    if (listing.userId.toString() !== id) {
+      return res.status(400).json({ success: false, message: "Unauthorized" });
+    }
+
+    const deleteListing = await Listing.findByIdAndDelete(listingId);
+
+    if (!deleteListing) {
+      return res.status(400).json({ success: false, message: "Failed to delete listing" });
+    }
+
+    return res.status(200).json({ success: true, message: "Listing deleted" });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
       error: error.message,
     });
   }

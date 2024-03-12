@@ -1,5 +1,6 @@
 const Listing = require("./listingModel");
 const User = require("../user/userModel");
+const Offer = require("../offer/offerModel");
 const cloudinary = require("cloudinary").v2;
 
 cloudinary.config({
@@ -134,6 +135,21 @@ exports.deleteListing = async (req, res) => {
       return res.status(400).json({ success: false, message: "Unauthorized" });
     }
 
+    // Remove offers from the database
+    const deleteOffers = await Offer.deleteMany({ offerListingId: listingId });
+
+    if (!deleteOffers) {
+      return res.status(400).json({ success: false, message: "Failed to delete offers" });
+    }
+
+    // Remove the listing from the user's listings array
+    const removeListingFromUser = await User.findByIdAndUpdate({ _id: id }, { $pull: { listings: listingId } });
+
+    if (!removeListingFromUser) {
+      return res.status(400).json({ success: false, message: "Failed to remove listing from user" });
+    }
+
+    // Remove the listing from the database
     const deleteListing = await Listing.findByIdAndDelete(listingId);
 
     if (!deleteListing) {
@@ -144,7 +160,7 @@ exports.deleteListing = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Server error",
+      message: "Server error 2",
       error: error.message,
     });
   }

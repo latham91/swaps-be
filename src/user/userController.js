@@ -109,3 +109,33 @@ exports.deleteUser = async (req, res) => {
     });
   }
 };
+
+exports.updateUser = async (req, res) => {
+  try {
+    const { id } = req.user;
+    const { username, email, password } = req.body;
+
+    if (!username || !email || !password) {
+      return res.status(400).json({ success: false, message: "All fields are required" });
+    }
+
+    const userExists = await User.findById(id);
+
+    if (!userExists) {
+      return res.status(400).json({ success: false, message: "No user found" });
+    }
+
+    await User.findByIdAndUpdate(id, { username, email, password }, { new: true });
+
+    return res.status(200).json({
+      success: true,
+      message: "User updated",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};

@@ -110,6 +110,17 @@ exports.declineOffer = async (req, res) => {
       });
     }
 
+    // remove offer from users listing offersArray
+    const offerListing = await Listing.findById(offer.wantedListingId);
+    const removeOfferFromListing = await offerListing.offersArray.pull(offerId);
+
+    if (!removeOfferFromListing) {
+      return res.status(400).json({
+        success: false,
+        message: "Offer not removed from listing",
+      });
+    }
+
     return res.status(200).json({
       success: true,
       message: "Offer declined",
